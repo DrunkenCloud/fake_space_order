@@ -21,7 +21,7 @@ def get_time(timer):
 	result += str(secs)
 	return result
 
-def enemy_movement(enemy_list):
+def enemy_movement(enemy_list, score):
 	if enemy_list:
 		for enemy_rect in enemy_list:
 			choice = randint(1, 4)
@@ -39,10 +39,11 @@ def enemy_movement(enemy_list):
 
 			if enemy_rect.y == screen.get_height():
 				enemy_rect.y = 0
+				score += 1
 
 			screen.blit(soul_surf, enemy_rect)
-		return enemy_list
-	else: return []
+		return enemy_list,score
+	else: return [],score
 
 pygame.display.set_caption("IDK Something")
 entry_font = pygame.font.Font('fonts/linux_biolinum/LinBiolinum_RB.otf ', 35)
@@ -74,7 +75,7 @@ start_time = 0
 game_run = False
 score = 0
 enemy_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(enemy_timer, 500)
+pygame.time.set_timer(enemy_timer, 2000)
 
 while running:
 	for event in pygame.event.get():
@@ -85,15 +86,20 @@ while running:
 			if event.type == enemy_timer:
 				enemies_rect_list.append(soul_surf.get_rect(topleft = (randint(50, screen.get_width() - 50), randint(0, screen.get_height() // 4))))
 
+	keys_pressed = ""
 	keys = pygame.key.get_pressed()
 	if keys[pygame.K_w]:
 		fou_rect.top -= int(300 * dt)
+		keys_pressed += "W" + " "
 	if keys[pygame.K_s]:
-		fou_rect.top += int(300 * dt) 
+		fou_rect.top += int(300 * dt)
+		keys_pressed += "S" + " "
 	if keys[pygame.K_a]:	
 		fou_rect.left -= int(300 * dt) 
+		keys_pressed += "A" + " "
 	if keys[pygame.K_d]:
 		fou_rect.left += int(300 * dt)
+		keys_pressed += "D" + " "
 
 	if fou_rect.left < 0:
 		fou_rect.x += (screen.get_width() - 50)
@@ -116,7 +122,7 @@ while running:
 	else:
 		screen.blit(sora_surface, (0,0))
 
-		enemies_rect_list = enemy_movement(enemies_rect_list)
+		enemies_rect_list, score = enemy_movement(enemies_rect_list, score)
 		
 		screen.blit(fou_surf, fou_rect)
 		timer = get_time(time.time() - start_time)
@@ -136,10 +142,9 @@ while running:
 					time.sleep(1)
 					running = False
 					break
-					
-		screen.blit(opening_text, (314,95))
+			else:		
+				screen.blit(opening_text, (314,95))
 		
 	pygame.display.flip()
 	dt = clock.tick(60) / 1000
-
 pygame.quit()
