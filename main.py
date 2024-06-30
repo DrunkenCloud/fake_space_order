@@ -3,6 +3,10 @@ import pygame
 from sys import exit, set_coroutine_origin_tracking_depth
 from pygame.mixer_music import play
 import time
+from random import randint
+
+pygame.init()
+screen = pygame.display.set_mode((900, 500))
 
 def get_time(timer):
 	secs = int((timer % 60) // 1)
@@ -17,8 +21,24 @@ def get_time(timer):
 	result += str(secs)
 	return result
 
-pygame.init()
-screen = pygame.display.set_mode((900, 500))
+def enemy_movement(enemy_list):
+	if enemy_list:
+		for enemy_rect in enemy_list:
+			choice = randint(1, 4)
+			if choice == 1:
+				enemy_rect.x -= 5
+			elif choice == 2:
+				enemy_rect.x += 5
+			if enemy_rect.left < 0:
+				enemy_rect.x += (screen.get_width() - 50)
+			elif enemy_rect.right > screen.get_width():
+				enemy_rect.x -= (screen.get_width() - 50)
+			enemy_rect.y += 1
+
+			screen.blit(soul_surf, enemy_rect)
+		return enemy_list
+	else: return []
+
 pygame.display.set_caption("IDK Something")
 entry_font = pygame.font.Font('fonts/linux_biolinum/LinBiolinum_RB.otf ', 35)
 exit_font = pygame.font.Font('fonts/linux_biolinum/LinBiolinum_RB.otf ', 40)
@@ -43,14 +63,22 @@ fou_rect = fou_surf.get_rect(center = (screen.get_width() // 2 ,screen.get_heigh
 shield_surf = pygame.image.load('images/shield.png')
 shield_rect = shield_surf.get_rect(topleft = (80, 150))
 
+enemies_rect_list = []
+
 start_time = 0
 game_run = False
 score = 0
+enemy_timer = pygame.USEREVENT + 1
+pygame.time.set_timer(enemy_timer, 500)
 
 while running:
 	for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				running = False
+		if event.type == pygame.QUIT:
+			running = False
+
+		if game_run:
+			if event.type == enemy_timer:
+				enemies_rect_list.append(soul_surf.get_rect(topleft = (randint(50, screen.get_width() - 50), randint(0, screen.get_height() // 4))))
 
 	keys = pygame.key.get_pressed()
 	if keys[pygame.K_w]:
@@ -73,12 +101,13 @@ while running:
 	else:
 		screen.blit(sora_surface, (0,0))
 
-		soul_rect.left -= 3
-		if soul_rect.left < 0:
-			score += 1
-			soul_rect.right = screen.get_width()
+		enemies_rect_list = enemy_movement(enemies_rect_list)
+
+		# soul_rect.left -= 3
+		# if soul_rect.left < 0:
+		# 	score += 1
+		# 	soul_rect.right = screen.get_width()
 		
-		screen.blit(soul_surf, soul_rect)
 		screen.blit(fou_surf, fou_rect)
 		timer = get_time(time.time() - start_time)
 		time_surf = dete_font.render(f"Timer = {timer}", False, "White")
@@ -89,14 +118,15 @@ while running:
 		score_rect = score_surf.get_rect(topright = (screen.get_width() - 15, 8))
 		screen.blit(score_surf, score_rect)
 
-		if(fou_rect.colliderect(soul_rect)):
-			screen.blit(game_over, (320, 100))
-			pygame.display.flip()
-			time.sleep(1)
-			break
+		if enemies_rect_list:
+			for enemy_rect in enemies_rect_list:
+				if(fou_rect.colliderect(enemy_rect)):
+					screen.blit(game_over, (320, 100))
+					pygame.display.flip()
+					time.sleep(1)
+					pygame.quit()
+					exit(1)
 		screen.blit(opening_text, (314,95))
 		
 	pygame.display.flip()
 	dt = clock.tick(60) / 1000
-
-pygame.quit()
