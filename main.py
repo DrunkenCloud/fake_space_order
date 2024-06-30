@@ -29,11 +29,16 @@ def enemy_movement(enemy_list):
 				enemy_rect.x -= 5
 			elif choice == 2:
 				enemy_rect.x += 5
+
 			if enemy_rect.left < 0:
 				enemy_rect.x += (screen.get_width() - 50)
 			elif enemy_rect.right > screen.get_width():
 				enemy_rect.x -= (screen.get_width() - 50)
+
 			enemy_rect.y += 1
+
+			if enemy_rect.y == screen.get_height():
+				enemy_rect.y = 0
 
 			screen.blit(soul_surf, enemy_rect)
 		return enemy_list
@@ -88,7 +93,17 @@ while running:
 	if keys[pygame.K_a]:	
 		fou_rect.left -= int(300 * dt) 
 	if keys[pygame.K_d]:
-		fou_rect.left += int(300 * dt) 
+		fou_rect.left += int(300 * dt)
+
+	if fou_rect.left < 0:
+		fou_rect.x += (screen.get_width() - 50)
+	elif fou_rect.right > screen.get_width():
+		fou_rect.x -= (screen.get_width() - 50)
+
+	if fou_rect.y >= (screen.get_height() - 50):
+		fou_rect.y = 0
+	elif fou_rect.y <= 0:
+		fou_rect.y = (screen.get_height() - 50)
 
 	if game_run == False:
 		screen.fill("Purple")
@@ -102,11 +117,6 @@ while running:
 		screen.blit(sora_surface, (0,0))
 
 		enemies_rect_list = enemy_movement(enemies_rect_list)
-
-		# soul_rect.left -= 3
-		# if soul_rect.left < 0:
-		# 	score += 1
-		# 	soul_rect.right = screen.get_width()
 		
 		screen.blit(fou_surf, fou_rect)
 		timer = get_time(time.time() - start_time)
@@ -124,9 +134,12 @@ while running:
 					screen.blit(game_over, (320, 100))
 					pygame.display.flip()
 					time.sleep(1)
-					pygame.quit()
-					exit(1)
+					running = False
+					break
+					
 		screen.blit(opening_text, (314,95))
 		
 	pygame.display.flip()
 	dt = clock.tick(60) / 1000
+
+pygame.quit()
