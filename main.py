@@ -64,6 +64,20 @@ class Enemy(pygame.sprite.Sprite):
 	def update(self):
 		self.enemy_movement()
 
+class Attack(pygame.sprite.Sprite):
+	def __init__(self, type, pos):
+		super().__init__()
+
+		if type == "ball":
+			self.image = pygame.image.load('images/shadow_ball.png').convert_alpha()
+			self.rect = self.image.get_rect(midbottom = (pos[0], pos[1]))
+
+	def attack_movement(self):
+		self.rect.y -= 2
+
+	def update(self):
+		self.attack_movement()
+
 def get_time(timer):
 	secs = int((timer % 60) // 1)
 	mins = int(((timer % 3600) - secs) // 60)
@@ -82,6 +96,10 @@ def has_collision():
 		return False
 	return True
 
+def enemy_kill():
+	collisions = pygame.sprite.groupcollide(attacks_group, enemies_group, True, True)
+	return sum(len(collided_enemies) for collided_enemies in collisions.values())
+
 pygame.init()
 screen = pygame.display.set_mode((900, 500))
 pygame.display.set_caption("IDK Something")
@@ -95,7 +113,9 @@ dt = 0
 
 player = pygame.sprite.GroupSingle()
 player.add(Player())
+
 enemies_group = pygame.sprite.Group()
+attacks_group = pygame.sprite.Group()
 
 sora_surface = pygame.image.load('images/bg.jpg').convert()
 
@@ -103,19 +123,14 @@ opening_text = entry_font.render("Fate Space Order", False, "Gold")
 tostart_text = entry_font.render("Press SPACE to Begin!", False, "Gold")
 game_over = exit_font.render("GAME OVER!!", False, "Red")
 
-soul_surf = pygame.image.load('images/enemy_1.png').convert_alpha()
-soul_rect = soul_surf.get_rect(topleft = (300, 200))
-
-shield_surf = pygame.image.load('images/shield.png')
-shield_rect = shield_surf.get_rect(topleft = (80, 150))
-
-enemies_rect_list = []
 game_run = False
 start_time = 0
 score = 0
 timer = ""
 enemy_timer = pygame.USEREVENT + 1
 pygame.time.set_timer(enemy_timer, 2000)
+attack_timer = pygame.USEREVENT + 2
+pygame.time.set_timer(attack_timer, 2000)
 
 while running:
 	for event in pygame.event.get():
@@ -125,6 +140,10 @@ while running:
 		if game_run:
 			if event.type == enemy_timer:
 				enemies_group.add(Enemy("soul"))
+
+			if event.type == attack_timer:
+				for players in player:
+					attacks_group.add(Attack("ball", [players.rect.x, players.rect.y]))
 
 	keys_pressed = ""
 	keys = pygame.key.get_pressed()
@@ -144,11 +163,10 @@ while running:
 		player.update()
 		player.draw(screen)
 		enemies_group.update()
-		for enemy in enemies_group:
-			if enemy.rect.y == screen.get_height():
-				enemy.rect.y = 0
-				score += 1
 		enemies_group.draw(screen)
+		attacks_group.update()
+		attacks_group.draw(screen)
+		score += enemy_kill()
 
 		timer = get_time(time.time() - start_time)
 		time_surf = dete_font.render(f"Timer = {timer}", False, "White")
