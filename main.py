@@ -61,8 +61,13 @@ class Enemy(pygame.sprite.Sprite):
 		if self.rect.y > screen.get_height():
 			self.rect.y = 0
 
+	def destroy(self):
+		if not game_run:
+			self.kill()
+
 	def update(self):
 		self.enemy_movement()
+		self.destroy()
 
 class Attack(pygame.sprite.Sprite):
 	def __init__(self, type, pos):
@@ -75,8 +80,13 @@ class Attack(pygame.sprite.Sprite):
 	def attack_movement(self):
 		self.rect.y -= 2
 
+	def destroy(self):
+		if not game_run:
+			self.kill()
+
 	def update(self):
 		self.attack_movement()
+		self.destroy()
 
 def get_time(timer):
 	secs = int((timer % 60) // 1)
@@ -166,13 +176,13 @@ while running:
 		enemies_group.draw(screen)
 		attacks_group.update()
 		attacks_group.draw(screen)
-		score += enemy_kill()
-
+		
 		timer = get_time(time.time() - start_time)
 		time_surf = dete_font.render(f"Timer = {timer}", False, "White")
 		time_rect = time_surf.get_rect(topleft = (15, 8))
 		screen.blit(time_surf, time_rect)
 
+		score += enemy_kill()
 		score_surf = dete_font.render(f"Score = {score}", False, "White")
 		score_rect = score_surf.get_rect(topright = (screen.get_width() - 15, 8))
 		screen.blit(score_surf, score_rect)
@@ -181,8 +191,11 @@ while running:
 		if not game_run:
 			screen.blit(game_over, (320, 100))
 			pygame.display.flip()
-			time.sleep(2)
-			break
+			time.sleep(1)
+			score = 0
+			enemies_group.update()
+			attacks_group.update()
+			continue
 
 	screen.blit(opening_text, (314,95))
 	pygame.display.flip()
