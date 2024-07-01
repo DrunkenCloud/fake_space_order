@@ -128,12 +128,14 @@ attacks_group = pygame.sprite.Group()
 sora_surface = pygame.image.load("images/bg.jpg").convert()
 
 opening_text = entry_font.render("Fate Space Order", False, "Gold")
-tostart_text = entry_font.render("Press SPACE to Begin!", False, "Gold")
+tostart_text = entry_font.render("Press SPACE to Begin!", False, "Green")
+toexit_text = entry_font.render("Press ENTER to Exit the Game", False, "LightBlue")
 game_over = exit_font.render("GAME OVER!!", False, "Red")
 
 game_run = False
 start_time = 0
 score = 0
+high_score = 0
 timer = ""
 enemy_timer = pygame.USEREVENT + 1
 pygame.time.set_timer(enemy_timer, 2000)
@@ -158,13 +160,19 @@ while running:
 
 	if game_run == False:
 		screen.fill("Purple")
-		screen.blit(opening_text, (314,95))
+		screen.blit(opening_text, (314,100))
 		player.update()
 		player.draw(screen)
 		screen.blit(tostart_text, (275, 150))
+		screen.blit(toexit_text, (210, 200))
+		highscore_text = dete_font.render(f"High Score: {high_score}", False, "Orange")
+		screen.blit(highscore_text, (360, 300))
 		if keys[pygame.K_SPACE]:
 			start_time = time.time()
 			game_run = True
+		if keys[pygame.K_RETURN]:
+			running = False
+			continue
 	else:
 		screen.blit(sora_surface, (0,0))
 		
@@ -190,12 +198,14 @@ while running:
 			screen.blit(game_over, (320, 100))
 			pygame.display.flip()
 			time.sleep(1)
+			if score > high_score:
+				high_score = score
 			score = 0
 			enemies_group.update()
 			attacks_group.update()
 			continue
 
-	screen.blit(opening_text, (314,95))
+	screen.blit(opening_text, (314,100))
 	pygame.display.flip()
 	dt = clock.tick(60) / 1000
 pygame.quit()
