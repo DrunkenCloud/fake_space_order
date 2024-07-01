@@ -75,10 +75,29 @@ class Attack(pygame.sprite.Sprite):
 			self.rect = self.image.get_rect(midbottom = (pos[0], pos[1]))
 
 	def attack_movement(self):
-		self.rect.y -= 2
+		self.rect.y -= 3
 
 	def destroy(self):
-		if not game_run:
+		if not game_run or self.rect.y < 0:
+			self.kill()
+
+	def update(self):
+		self.attack_movement()
+		self.destroy()
+
+class Trial_Attack(pygame.sprite.Sprite):
+	def __init__(self, type, pos):
+		super().__init__()
+
+		if type == "ball":
+			self.image = pygame.image.load("images/shadow_ball.png").convert_alpha()
+			self.rect = self.image.get_rect(midbottom = (pos[0], pos[1]))
+
+	def attack_movement(self):
+		self.rect.y -= 3
+
+	def destroy(self):
+		if self.rect.y < 0:
 			self.kill()
 
 	def update(self):
@@ -125,29 +144,41 @@ clock = pygame.time.Clock()
 running = True
 dt = 0
 music = 2
+reloader = 0
 
 player = pygame.sprite.GroupSingle()
 player.add(Player())
 
 enemies_group = pygame.sprite.Group()
 attacks_group = pygame.sprite.Group()
+trial_attacks_group = pygame.sprite.Group()
 
 sora_surface = pygame.image.load("images/bg.jpg").convert()
+wasd_surface = pygame.image.load("images/wasd.jpeg").convert_alpha()
+shadow_ball_surf = pygame.image.load("images/shadow_ball.png").convert_alpha()
+soul_surf = pygame.image.load("images/enemy_1.png").convert_alpha()
 
 opening_text = entry_font.render("Fake Space Order", False, "Gold")
-tostart_text = entry_font.render("Press SPACE to Begin!", False, "Green")
-toexit_text = entry_font.render("Press ENTER to Exit the Game", False, "LightBlue")
+tostart_text = entry_font.render("Press ENTER to Enter/Exit", False, "Green")
+toexit_text = entry_font.render("Press ESCAPE to Exit the Game", False, "LightBlue")
+movement = dete_font.render("Move Fou via WASD", False, "Black")
+how_to_attack1 = dete_font.render("Attack using SPACE", False, "Pink")
+how_to_attack2 = dete_font.render("Reload time is 2 seconds", False, "Pink")
+enemies_kill1 = dete_font.render("These are the Enemies", False, "Violet")
+enemies_kill2 = dete_font.render("If You Touch Them", False, "Violet")
+enemies_kill3 = dete_font.render("You Loose", False, "Violet")
+enemies_kill4 = dete_font.render("Kill Them", False, "Violet")
+enemies_kill5 = dete_font.render("To Increase your Score", False, "Violet")
 game_over = exit_font.render("GAME OVER!!", False, "Red")
 
 game_run = False
-start_time = 0
+start_time = time.time()
 score = 0
 high_score = 0
 timer = ""
 enemy_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(enemy_timer, 2000)
-attack_timer = pygame.USEREVENT + 2
-pygame.time.set_timer(attack_timer, 2000)
+pygame.time.set_timer(enemy_timer, 1500)
+reload_timer = time.time()
 
 while running:
 	for event in pygame.event.get():
@@ -158,10 +189,6 @@ while running:
 			if event.type == enemy_timer:
 				enemies_group.add(Enemy("soul"))
 
-			if event.type == attack_timer:
-				for players in player:
-					attacks_group.add(Attack("ball", [players.rect.x, players.rect.y]))
-
 	keys_pressed = ""
 	keys = pygame.key.get_pressed()
 
@@ -170,20 +197,55 @@ while running:
 			play_music(music1)
 			music = 1
 		screen.fill("Purple")
-		screen.blit(opening_text, (310,100))
-		player.update()
-		player.draw(screen)
-		screen.blit(tostart_text, (275, 150))
-		screen.blit(toexit_text, (210, 200))
+		screen.blit(wasd_surface, (65, 350))
+		screen.blit(tostart_text, (240, 150))
+		screen.blit(toexit_text, (200, 200))
 		highscore_text = dete_font.render(f"High Score: {high_score}", False, "Orange")
 		screen.blit(highscore_text, (360, 300))
+		screen.blit(movement, (40, 300))
+		screen.blit(how_to_attack1, (320, 350))
+		screen.blit(how_to_attack2, (295, 380))
+		screen.blit(shadow_ball_surf, (310, 440))
+		screen.blit(enemies_kill1, (600, 300))
+		screen.blit(enemies_kill2, (600, 330))
+		screen.blit(enemies_kill3, (600, 360))
+		screen.blit(enemies_kill4, (600, 390))
+		screen.blit(enemies_kill5, (600, 420))
+		screen.blit(soul_surf, (775, 365))
+		player.update()
+		player.draw(screen)
+		trial_attacks_group.update()
+		trial_attacks_group.draw(screen)
+		if (time.time() - reload_timer > 2):
+			reload_rect = pygame.rect.Rect(360,430,200,50)
+		else:
+			reload_rect = pygame.rect.Rect(360, 430, 200*((time.time() - reload_timer) / 2), 50)	
+		pygame.draw.rect(screen, "Pink", reload_rect)
+		pygame.draw.rect(screen, "Black", pygame.rect.Rect(360,430,200,50), 7)
 		if keys[pygame.K_SPACE]:
+			if (time.time() - reload_timer) > 2:
+				trial_attacks_group.add(Trial_Attack("ball", [player.sprite.rect.x, player.sprite.rect.y]))
+				reload_timer = time.time()
+		if keys[pygame.K_RETURN]:
 			start_time = time.time()
 			game_run = True
-		if keys[pygame.K_RETURN]:
+			reload_timer = time.time()
+		if keys[pygame.K_ESCAPE]:
 			running = False
 			continue
 	else:
+		if keys[pygame.K_ESCAPE]:
+			running = False
+			continue
+		if keys[pygame.K_RETURN] and (time.time() - start_time) > 2:
+			game_run = False
+			pygame.display.flip()
+			if score > high_score:
+				high_score = score
+			score = 0
+			enemies_group.update()
+			attacks_group.update()
+			continue
 		if music != 2:
 			play_music(music2)
 			music = 2
@@ -192,6 +254,10 @@ while running:
 		player.draw(screen)
 		enemies_group.update()
 		enemies_group.draw(screen)
+		if keys[pygame.K_SPACE]:
+			if (time.time() - reload_timer) > 2:
+				attacks_group.add(Attack("ball", [player.sprite.rect.x, player.sprite.rect.y]))
+				reload_timer = time.time()
 		attacks_group.update()
 		attacks_group.draw(screen)
 		
@@ -204,6 +270,13 @@ while running:
 		score_surf = dete_font.render(f"Score = {score}", False, "White")
 		score_rect = score_surf.get_rect(topright = (screen.get_width() - 15, 8))
 		screen.blit(score_surf, score_rect)
+
+		if (time.time() - reload_timer > 2):
+			reload_rect = pygame.rect.Rect(600,400,200,50)
+		else:
+			reload_rect = pygame.rect.Rect(600, 400, 200*((time.time() - reload_timer) / 2), 50)	
+		pygame.draw.rect(screen, "Purple", reload_rect)
+		pygame.draw.rect(screen, "Black", pygame.rect.Rect(600,400,200,50), 7)
 
 		game_run = has_collision()
 		if not game_run:
