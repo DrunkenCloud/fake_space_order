@@ -170,7 +170,7 @@ while running:
 			play_music(music1)
 			music = 1
 		screen.fill("Purple")
-		screen.blit(opening_text, (314,100))
+		screen.blit(opening_text, (310,100))
 		player.update()
 		player.draw(screen)
 		screen.blit(tostart_text, (275, 150))
@@ -217,7 +217,7 @@ while running:
 			attacks_group.update()
 			continue
 
-	screen.blit(opening_text, (314,100))
+	screen.blit(opening_text, (310,100))
 	pygame.display.flip()
 	dt = clock.tick(60) / 1000
 pygame.quit()
