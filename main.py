@@ -96,7 +96,7 @@ class Trial_Attack(pygame.sprite.Sprite):
         self.rect.y -= 3
 
     def destroy(self):
-        if self.rect.y < 0:
+        if self.rect.y < 0 or game_run:
             self.kill()
 
     def update(self):
@@ -211,10 +211,6 @@ while running:
         screen.blit(enemies_kill4, (600, 390))
         screen.blit(enemies_kill5, (600, 420))
         screen.blit(soul_surf, (775, 365))
-        player.update()
-        player.draw(screen)
-        trial_attacks_group.update()
-        trial_attacks_group.draw(screen)
         if (time.time() - reload_timer > 2):
             reload_rect = pygame.rect.Rect(360,430,200,50)
         else:
@@ -232,6 +228,10 @@ while running:
         if keys[pygame.K_ESCAPE]:
             running = False
             continue
+        player.update()
+        player.draw(screen)
+        trial_attacks_group.update()
+        trial_attacks_group.draw(screen)
     else:
         if keys[pygame.K_ESCAPE]:
             running = False
