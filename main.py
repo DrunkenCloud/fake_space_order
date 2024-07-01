@@ -158,7 +158,7 @@ shadow_ball_surf = pygame.image.load("images/shadow_ball.png").convert_alpha()
 soul_surf = pygame.image.load("images/enemy_1.png").convert_alpha()
 
 opening_text = entry_font.render("Fake Space Order", False, "Gold")
-tostart_text = entry_font.render("Press ENTER to Enter/Exit", False, "Green")
+tostart_text = entry_font.render("Press ENTER to Enter/Exit (2s Cooldown)", False, "Green")
 toexit_text = entry_font.render("Press ESCAPE to Exit the Game", False, "LightBlue")
 movement = dete_font.render("Move Fou via WASD", False, "Black")
 how_to_attack1 = dete_font.render("Attack using SPACE", False, "Pink")
@@ -197,7 +197,7 @@ while running:
             music = 1
         screen.fill("Purple")
         screen.blit(wasd_surface, (65, 350))
-        screen.blit(tostart_text, (240, 150))
+        screen.blit(tostart_text, (120, 150))
         screen.blit(toexit_text, (200, 200))
         highscore_text = dete_font.render(f"High Score: {high_score}", False, "Orange")
         screen.blit(highscore_text, (360, 300))
