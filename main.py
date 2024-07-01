@@ -1,5 +1,4 @@
 import pygame
-from pygame.mixer_music import play
 import time
 from random import randint
 
@@ -108,16 +107,24 @@ def enemy_kill():
 	collisions = pygame.sprite.groupcollide(attacks_group, enemies_group, True, True)
 	return sum(len(collided_enemies) for collided_enemies in collisions.values())
 
+def play_music(song):
+    pygame.mixer.music.load(song)
+    pygame.mixer.music.play(-1)
+
 pygame.init()
+pygame.mixer.init()
 screen = pygame.display.set_mode((900, 500))
 pygame.display.set_caption("IDK Something")
 entry_font = pygame.font.Font("fonts/linux_biolinum/LinBiolinum_RB.otf", 35)
 exit_font = pygame.font.Font("fonts/linux_biolinum/LinBiolinum_RB.otf", 40)
 dete_font = pygame.font.Font("fonts/linux_biolinum/LinBiolinum_RI.otf", 30)
+music1 = "songs/holo.mp3"
+music2 = "songs/Zoltraak.mp3"
 
 clock = pygame.time.Clock()
 running = True
 dt = 0
+music = 2
 
 player = pygame.sprite.GroupSingle()
 player.add(Player())
@@ -159,6 +166,9 @@ while running:
 	keys = pygame.key.get_pressed()
 
 	if game_run == False:
+		if music != 1:
+			play_music(music1)
+			music = 1
 		screen.fill("Purple")
 		screen.blit(opening_text, (314,100))
 		player.update()
@@ -174,8 +184,10 @@ while running:
 			running = False
 			continue
 	else:
+		if music != 2:
+			play_music(music2)
+			music = 2
 		screen.blit(sora_surface, (0,0))
-		
 		player.update()
 		player.draw(screen)
 		enemies_group.update()
@@ -197,7 +209,7 @@ while running:
 		if not game_run:
 			screen.blit(game_over, (320, 100))
 			pygame.display.flip()
-			time.sleep(1)
+			time.sleep(1.5)
 			if score > high_score:
 				high_score = score
 			score = 0
