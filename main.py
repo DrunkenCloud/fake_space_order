@@ -9,7 +9,7 @@ from sys import exit
 class Player(pygame.sprite.Sprite):
 	def __init__(self):
 		super().__init__()
-		self.image = pygame.image.load('images/fou.png').convert_alpha()
+		self.image = pygame.image.load("images/fou.png").convert_alpha()
 		self.rect = self.image.get_rect(center = (screen.get_width()//2, screen.get_height()//2))
 
 	def player_input(self):
@@ -41,7 +41,7 @@ class Enemy(pygame.sprite.Sprite):
 		super().__init__()
 
 		if type == "soul":
-			self.image = pygame.image.load('images/enemy_1.png').convert_alpha()
+			self.image = pygame.image.load("images/enemy_1.png").convert_alpha()
 			self.rect = self.image.get_rect(topleft = (randint(50, screen.get_width() - 50), randint(0, screen.get_height() // 4)))
 
 	def enemy_movement(self):
@@ -74,7 +74,7 @@ class Attack(pygame.sprite.Sprite):
 		super().__init__()
 
 		if type == "ball":
-			self.image = pygame.image.load('images/shadow_ball.png').convert_alpha()
+			self.image = pygame.image.load("images/shadow_ball.png").convert_alpha()
 			self.rect = self.image.get_rect(midbottom = (pos[0], pos[1]))
 
 	def attack_movement(self):
@@ -113,9 +113,9 @@ def enemy_kill():
 pygame.init()
 screen = pygame.display.set_mode((900, 500))
 pygame.display.set_caption("IDK Something")
-entry_font = pygame.font.Font('fonts/linux_biolinum/LinBiolinum_RB.otf', 35)
-exit_font = pygame.font.Font('fonts/linux_biolinum/LinBiolinum_RB.otf', 40)
-dete_font = pygame.font.Font('fonts/linux_biolinum/LinBiolinum_RI.otf', 30)
+entry_font = pygame.font.Font("fonts/linux_biolinum/LinBiolinum_RB.otf", 35)
+exit_font = pygame.font.Font("fonts/linux_biolinum/LinBiolinum_RB.otf", 40)
+dete_font = pygame.font.Font("fonts/linux_biolinum/LinBiolinum_RI.otf", 30)
 
 clock = pygame.time.Clock()
 running = True
@@ -127,7 +127,7 @@ player.add(Player())
 enemies_group = pygame.sprite.Group()
 attacks_group = pygame.sprite.Group()
 
-sora_surface = pygame.image.load('images/bg.jpg').convert()
+sora_surface = pygame.image.load("images/bg.jpg").convert()
 
 opening_text = entry_font.render("Fate Space Order", False, "Gold")
 tostart_text = entry_font.render("Press SPACE to Begin!", False, "Gold")
