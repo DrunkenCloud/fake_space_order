@@ -114,7 +114,7 @@ def play_music(song):
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((900, 500))
-pygame.display.set_caption("IDK Something")
+pygame.display.set_caption("Dont sue me for Copyright pls")
 entry_font = pygame.font.Font("fonts/linux_biolinum/LinBiolinum_RB.otf", 35)
 exit_font = pygame.font.Font("fonts/linux_biolinum/LinBiolinum_RB.otf", 40)
 dete_font = pygame.font.Font("fonts/linux_biolinum/LinBiolinum_RI.otf", 30)
@@ -134,7 +134,7 @@ attacks_group = pygame.sprite.Group()
 
 sora_surface = pygame.image.load("images/bg.jpg").convert()
 
-opening_text = entry_font.render("Fate Space Order", False, "Gold")
+opening_text = entry_font.render("Fake Space Order", False, "Gold")
 tostart_text = entry_font.render("Press SPACE to Begin!", False, "Green")
 toexit_text = entry_font.render("Press ENTER to Exit the Game", False, "LightBlue")
 game_over = exit_font.render("GAME OVER!!", False, "Red")
