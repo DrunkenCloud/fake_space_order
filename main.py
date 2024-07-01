@@ -1,9 +1,7 @@
-from typing import Self
 import pygame
 from pygame.mixer_music import play
 import time
 from random import randint
-from sys import exit
 
 
 class Player(pygame.sprite.Sprite):
